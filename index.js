@@ -3,17 +3,33 @@ const express = require('express');
 const admin = require('firebase-admin');
 const fs = require('fs');
 
-// Initialiser Firebase Admin avec la clé privée
-const serviceAccount = JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'));
+// 🔐 Initialiser Firebase Admin avec le fichier de clé JSON fourni via Render
+let serviceAccount = null;
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  try {
+    serviceAccount = JSON.parse(
+      fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8')
+    );
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+
+    console.log('✅ Firebase Admin initialisé avec succès.');
+  } catch (err) {
+    console.error('❌ Erreur de lecture de la clé :', err.message);
+    process.exit(1);
+  }
+} else {
+  console.error('❌ GOOGLE_APPLICATION_CREDENTIALS n’est pas défini.');
+  process.exit(1);
+}
 
 const app = express();
 app.use(express.json());
 
-// Endpoint POST pour envoyer une notification
+// ✅ Endpoint pour envoyer une notification FCM
 app.post('/send', async (req, res) => {
   const { token, title, body } = req.body;
 
@@ -38,10 +54,7 @@ app.post('/send', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`FCM server en écoute sur http://localhost:${PORT}`));
-
-
+// ✅ Endpoint pour envoyer un message et sauvegarder dans Firestore
 app.post('/send-message', async (req, res) => {
   const { senderId, receiverId, text } = req.body;
 
@@ -139,7 +152,6 @@ app.post('/send-message', async (req, res) => {
       }
     }
 
-    // Envoyer une seule réponse ici
     res.status(200).json({
       message: 'Message envoyé et conversation mise à jour',
       notification: notificationResult
@@ -150,3 +162,7 @@ app.post('/send-message', async (req, res) => {
     res.status(500).json({ error: 'Erreur lors de l’envoi du message' });
   }
 });
+
+// ✅ Lancer le serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 FCM server en écoute sur http://localhost:${PORT}`));
