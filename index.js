@@ -84,7 +84,7 @@ app.post('/send-message', async (req, res) => {
       : `${receiverId}-${senderId}`;
 
     const messageData = {
-      senderIddd,
+      senderId,
       receiverId,
       text,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
