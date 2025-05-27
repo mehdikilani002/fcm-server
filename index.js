@@ -84,7 +84,7 @@ app.post('/send-message', async (req, res) => {
       : `${receiverId}-${senderId}`;
 
     const messageData = {
-      senderId,
+      senderIddd,
       receiverId,
       text,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
@@ -94,7 +94,7 @@ app.post('/send-message', async (req, res) => {
       .collection('chats')
       .doc(conversationId)
       .collection('messages')
-      //.add(messageData);
+      .add(messageData);
 
     const convoForSender = {
       userName: receiverName,
@@ -171,5 +171,5 @@ app.post('/send-message', async (req, res) => {
 });
 
 //  Lancer le serveur
-//const PORT = process.env.PORT || 3000;
-//app.listen(PORT, '0.0.0.0', () => console.log(`🚀 FCM server en écoute sur http://localhost:${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 FCM server en écoute sur http://localhost:${PORT}`));
