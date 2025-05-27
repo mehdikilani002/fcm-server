@@ -60,7 +60,7 @@ app.post('/send', async (req, res) => {
 });
 
 //  Endpoint pour envoyer un message et sauvegarder dans Firestore
-app.post('/send-message', async (req, res) => {
+app.post('/send-messagess', async (req, res) => {
   const { senderId, receiverId, text } = req.body;
 
   if (!senderId || !receiverId || !text) {
